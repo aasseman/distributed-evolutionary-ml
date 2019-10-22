@@ -15,7 +15,7 @@
 # This Dockerfile describes the Docker image that will contain the Python code of the worker nodes, as well as
 # all the dependencies.
 
-FROM ubuntu:16.04 AS build
+FROM ubuntu:18.04 AS build
 
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
@@ -36,10 +36,9 @@ RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86
 ENV PATH /opt/conda/bin:$PATH
 
 # Setting specific versions of redis and rq because of https://github.com/rq/rq/issues/1014
-RUN conda install python=3.6 && \
-    conda install pytorch-cpu -c pytorch && \
+RUN conda install pytorch cpuonly -c pytorch && \
     conda install cmake numpy setuptools pyyaml && \
-    pip install --no-cache-dir gym[atari] redis==2.10.6 rq==0.12.0 && \
+    pip install --no-cache-dir gym[atari] redis rq && \
     conda clean -ya
 
 COPY worker.py nn.py rq_worker.py supervisord_launch.sh supervisord.conf /root/worker/
